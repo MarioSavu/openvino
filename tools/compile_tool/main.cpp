@@ -394,6 +394,8 @@ static void setDefaultIO(ov::preprocess::PrePostProcessor& preprocessor,
     if (isVPUX) {
         for (size_t i = 0; i < inputs.size(); i++) {
             preprocessor.input(i).tensor().set_element_type(ov::element::u8);
+            preprocessor.input(i).tensor().set_layout(ov::Layout("NCHW")); // TODO: default layout for rank
+            preprocessor.input(i).model().set_layout(ov::Layout("NCHW"));
         }
         for (size_t i = 0; i < outputs.size(); i++) {
             preprocessor.output(i).tensor().set_element_type(ov::element::f32);
