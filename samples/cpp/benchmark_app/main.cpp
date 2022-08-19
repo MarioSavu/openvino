@@ -933,6 +933,20 @@ int main(int argc, char* argv[]) {
 
         inferRequestsQueue.wait_all();
 
+#if 1
+        ov::Tensor output = inferRequest->get_output_tensor();
+
+        // Read labels from file (e.x. AlexNet.labels)
+        std::string labelFileName = fileNameNoExt(FLAGS_m) + ".labels";
+        std::vector<std::string> labels;
+
+        constexpr auto N_TOP_RESULTS = 10;
+
+        // Prints formatted classification results
+        ClassificationResult classificationResult(output, {FLAGS_i}, batchSize, N_TOP_RESULTS, labels);
+        classificationResult.show();
+#endif
+
         auto duration_ms = inferRequestsQueue.get_latencies()[0];
         slog::info << "First inference took " << double_to_string(duration_ms) << " ms" << slog::endl;
 
