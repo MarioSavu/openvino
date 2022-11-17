@@ -84,6 +84,35 @@ bool parse_and_check_command_line(int argc, char* argv[]) {
     return true;
 }
 
+
+void printInputAndOutputsInfoShort(const ov::CompiledModel& network) {
+    std::cout << "Network inputs:" << std::endl;
+    for (auto&& input : network.inputs()) {
+        std::cout << "    " << input.get_any_name() << " (node: " << input.get_node()->get_friendly_name()
+                  << ") : " << input.get_element_type() << " / " << ov::layout::get_layout(input).to_string()
+                  << std::endl;
+    }
+
+    std::cout << "Network outputs:" << std::endl;
+    for (auto&& output : network.outputs()) {
+        std::string out_name = "***NO_NAME***";
+        std::string node_name = "***NO_NAME***";
+
+        // Workaround for "tensor has no name" issue
+        try {
+            out_name = output.get_any_name();
+        } catch (const ov::Exception&) {
+        }
+        try {
+            node_name = output.get_node()->get_input_node_ptr(0)->get_friendly_name();
+        } catch (const ov::Exception&) {
+        }
+
+        std::cout << "    " << out_name << " (node: " << node_name << ") : " << output.get_element_type() << " / "
+                  << ov::layout::get_layout(output).to_string() << std::endl;
+    }
+}
+
 /**
  * @brief The entry point of the benchmark application
  */
