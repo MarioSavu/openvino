@@ -115,6 +115,16 @@ int main(int argc, char* argv[]) {
 
         // 1) Select input with 'input_tensor_name' tensor name
         InputInfo& input_info = ppp.input(input_tensor_name);
+        const ov::Layout tensor_layout{"NHWC"};
+
+        // 1) Set input tensor information:
+        // - input() provides information about a single model input
+        // - precision of tensor is supposed to be 'u8'
+        // - layout of data is 'NHWC'
+        // - set static spatial dimensions to input tensor to resize from
+        ppp.input()
+            .tensor()
+            .set_layout(tensor_layout);
         // 2) Set input type
         // - as 'u8' precision
         // - set color format to NV12 (single plane)
@@ -132,7 +142,7 @@ int main(int argc, char* argv[]) {
             .convert_color(ColorFormat::BGR)
             .resize(ResizeAlgorithm::RESIZE_LINEAR);
         // 4) Set model data layout (Assuming model accepts images in NCHW layout)
-        input_info.model().set_layout("NCHW");
+        input_info.model().set_layout("NHWC");
 
         // 5) Apply preprocessing to an input with 'input_tensor_name' name of loaded model
         model = ppp.build();
@@ -176,6 +186,15 @@ int main(int argc, char* argv[]) {
         // Print classification results
         ClassificationResult classification_result(output, {image_path}, batch, N_TOP_RESULTS, labels);
         classification_result.show();
+
+        std::ofstream myfile;
+        myfile.open ("nv12_to_rgb_img.bin", std::ios::out | std::ios::binary);
+        myfile.write((const char *)output.data(), output.get_byte_size());
+
+        myfile.close();
+        std::cout << "output tensor size" << output.get_size() << "\n";
+        std::cout << "output tensor byte size" << output.get_byte_size() << "\n";
+
 
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
