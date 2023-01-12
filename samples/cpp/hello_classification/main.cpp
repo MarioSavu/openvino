@@ -83,7 +83,7 @@ int tmain(int argc, tchar* argv[]) {
         // ppp.input().preprocess().resize(ov::preprocess::ResizeAlgorithm::RESIZE_LINEAR);
         ppp.input().preprocess().crop({0, 0, 0, 0}, {1, 224, 224, 3});
         // 4) Here we suppose model has 'NCHW' layout for input
-        ppp.input().model().set_layout("NCHW");
+        ppp.input().model().set_layout("NHWC");
         // 5) Set output tensor information:
         // - precision of tensor is supposed to be 'f32'
         ppp.output().tensor().set_element_type(ov::element::f32);
